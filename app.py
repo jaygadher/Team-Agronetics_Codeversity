@@ -3,19 +3,31 @@ import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
 from PIL import Image
-from flask import Flask, request, render_template, jsonify, redirect, url_for
+from flask import Flask, request, render_template, jsonify, redirect, url_for, flash
 import io
 import base64
+import json
+from datetime import datetime
 
+# Import configuration
+from config import config
+
+# Initialize Flask app
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config.from_object(config)
 
-# Configure upload folder
-UPLOAD_FOLDER = 'uploads'
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+# Ensure upload and detection results directories exist
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['DETECTION_RESULTS'], exist_ok=True)
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# Load the model
+try:
+    from model_loader import load_model
+    model = load_model()
+    print("Model loaded successfully!")
+except Exception as e:
+    print(f"Error loading model: {e}")
+    model = None
 
 # Load the model
 model_path = 'plant_disease_model.pth'
@@ -134,7 +146,8 @@ transform = transforms.Compose([
 ])
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in config.ALLOWED_EXTENSIONS
 
 def predict_disease(image_path):
     try:
@@ -232,12 +245,22 @@ def upload_file():
 def create_app():
     return app
 
+def create_app():
+    return app
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    print("Starting Plant Disease Detection App...")
-    print("Model loaded successfully!")
-    print("Beautiful mobile-first design ready!")
-    print("=" * 50)
-    print(f"Server starting on http://localhost:{port}")
-    print("Press Ctrl+C to stop the server")
-    app.run(host='0.0.0.0', port=port, debug=False)
+    print("\n" + "="*50)
+    print("Plant Disease Detection App")
+    print("="*50)
+    print(f"Environment: {'Development' if app.config['DEBUG'] else 'Production'}")
+    print(f"Upload folder: {os.path.abspath(app.config['UPLOAD_FOLDER'])}")
+    print(f"Model path: {os.path.abspath(app.config['MODEL_PATH'])}")
+    print("="*50 + "\n")
+    
+    if model is None:
+        print("WARNING: Model failed to load. Some features may not work correctly.")
+    
+    print(f"Starting server on http://localhost:{port}")
+    print("Press Ctrl+C to stop the server\n")
+    app.run(host='0.0.0.0', port=port, debug=app.config['DEBUG'])
