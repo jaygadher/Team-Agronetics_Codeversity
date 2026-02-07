@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Plant Disease Detection Web Application
 
 A simple and user-friendly web application for detecting plant diseases using machine learning. Upload a photo of a plant leaf and get instant predictions with confidence scores.
@@ -93,3 +94,6 @@ You can customize the application by:
 ## Support
 
 If you encounter any issues, check the console output for error messages and ensure all dependencies are properly installed.
+=======
+# Team-Agronetics_Codeversity
+>>>>>>> 86c41b8e6d6c62196b2c4602425febfa6f50c6dd
