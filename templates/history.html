@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Plant Disease Detection - History</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#17cf17",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#112111",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+    <div class="flex h-screen flex-col">
+        <header class="sticky top-0 z-10 bg-background-light/80 p-4 pb-3 backdrop-blur-sm dark:bg-background-dark/80">
+            <div class="relative flex items-center">
+                <button onclick="goBack()" class="flex h-10 w-10 items-center justify-center text-background-dark dark:text-background-light">
+                    <span class="material-symbols-outlined">arrow_back_ios_new</span>
+                </button>
+                <h1 class="flex-1 text-center text-lg font-bold text-background-dark dark:text-background-light">History</h1>
+                <div class="h-10 w-10"></div>
+            </div>
+        </header>
+        <main class="flex-1 overflow-y-auto p-4">
+            <h2 class="mb-4 text-xl font-bold text-background-dark dark:text-background-light">Past Scans</h2>
+            <div id="historyList" class="space-y-3">
+                <!-- History items will be populated here -->
+                <div class="text-center py-8">
+                    <span class="material-symbols-outlined text-6xl text-gray-400 mb-4">history</span>
+                    <p class="text-gray-500 dark:text-gray-400">No scans yet</p>
+                    <p class="text-sm text-gray-400 dark:text-gray-500 mt-2">Start by scanning your first plant image</p>
+                </div>
+            </div>
+        </main>
+        <footer class="sticky bottom-0 border-t border-gray-200 bg-background-light/80 backdrop-blur-sm dark:border-gray-800 dark:bg-background-dark/80">
+            <nav class="flex justify-around p-2">
+                <a class="flex flex-1 flex-col items-center justify-center gap-1 rounded-lg p-2 text-gray-500 hover:bg-primary/10 dark:text-gray-400 dark:hover:bg-primary/20" href="/">
+                    <span class="material-symbols-outlined">home</span>
+                    <span class="text-xs">Home</span>
+                </a>
+                <a class="flex flex-1 flex-col items-center justify-center gap-1 rounded-lg p-2 text-gray-500 hover:bg-primary/10 dark:text-gray-400 dark:hover:bg-primary/20" href="/scan">
+                    <span class="material-symbols-outlined">camera</span>
+                    <span class="text-xs">Scan</span>
+                </a>
+                <a class="flex flex-1 flex-col items-center justify-center gap-1 rounded-lg bg-primary/20 p-2 text-primary dark:bg-primary/30" href="/history">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">history</span>
+                    <span class="text-xs font-bold">History</span>
+                </a>
+                <a class="flex flex-1 flex-col items-center justify-center gap-1 rounded-lg p-2 text-gray-500 hover:bg-primary/10 dark:text-gray-400 dark:hover:bg-primary/20" href="/profile">
+                    <span class="material-symbols-outlined">person</span>
+                    <span class="text-xs">Profile</span>
+                </a>
+            </nav>
+        </footer>
+    </div>
+
+    <script>
+        function goBack() {
+            window.location.href = '/';
+        }
+
+        function formatDiseaseName(name) {
+            return name.replace(/_/g, ' ')
+                      .replace(/\b\w/g, l => l.toUpperCase())
+                      .replace('___', ' - ');
+        }
+
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('en-US', { 
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+        }
+
+        function loadHistory() {
+            // Get scan history from localStorage
+            const history = JSON.parse(localStorage.getItem('scanHistory') || '[]');
+            const historyList = document.getElementById('historyList');
+
+            if (history.length === 0) {
+                return; // Show default empty state
+            }
+
+            historyList.innerHTML = '';
+
+            history.forEach((item, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'flex cursor-pointer items-center gap-4 rounded-xl bg-white p-3 shadow-sm transition-all hover:shadow-md dark:bg-background-dark/50 dark:hover:bg-background-dark/80';
+                
+                const diseaseName = formatDiseaseName(item.prediction);
+                const confidence = (item.confidence * 100).toFixed(1);
+                const date = formatDate(item.timestamp);
+                
+                historyItem.innerHTML = `
+                    <img alt="${diseaseName}" class="h-16 w-16 rounded-lg object-cover" src="${item.image}">
+                    <div class="flex-1">
+                        <p class="font-semibold text-background-dark dark:text-background-light">${diseaseName}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">${date}</p>
+                        <p class="text-xs text-primary">Confidence: ${confidence}%</p>
+                    </div>
+                    <span class="material-symbols-outlined text-gray-400 dark:text-gray-500">chevron_right</span>
+                `;
+                
+                historyItem.onclick = () => {
+                    // Store current item data and redirect to results
+                    localStorage.setItem('scanResults', JSON.stringify({
+                        prediction: item.prediction,
+                        confidence: item.confidence,
+                        top3: item.top3 || []
+                    }));
+                    localStorage.setItem('scanImage', item.image);
+                    window.location.href = '/results';
+                };
+                
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        // Load history when page loads
+        document.addEventListener('DOMContentLoaded', loadHistory);
+    </script>
+</body>
+</html>

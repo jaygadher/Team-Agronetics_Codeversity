@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Plant Disease Detection App</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#17cf17",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#112111",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 1,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+    <div class="flex flex-col h-screen justify-between">
+        <main class="flex-grow flex flex-col items-center justify-center text-center px-6 pt-12">
+            <div class="w-full max-w-sm">
+                <img alt="Illustration of a healthy plant leaf" class="w-48 h-48 mx-auto mb-8" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPhH4YpscGlX8u7ZmXm7bRsDytSdW33G8wdy8zJBRhs1wmqC1PKV0rdgCuzP3bO7S-XK8rSqtk-JLKIa0z7YNVEmh1svWzwuLnBvzf7j5eNm4g4o09GZ9dLFEN0CJtENJWrdEEwG8q7qH-_lY-XbObIvBSh0JtRAjNugZj6KqJWRz8ovLMW_7lYBzc3_2PPmtlDFf5m7vABBrEnmEuxIGIviOZjJOYS0yZ0EdXLpVFizX31TJV_uFbcpyxeSPEJruRahkV8h2Gnd7r"/>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Welcome to AgroScan</h1>
+                <p class="mt-4 text-base text-gray-600 dark:text-gray-300">
+                    Enhancing precision agriculture for healthier crops. Detect plant diseases early and accurately with our advanced machine learning technology.
+                </p>
+            </div>
+        </main>
+        <div class="px-6 pb-6">
+            <button onclick="goToScan()" class="w-full bg-primary text-black font-bold py-3 rounded-lg text-lg shadow-lg hover:bg-primary/90 transition-colors">
+                Get Started
+            </button>
+        </div>
+        <nav class="border-t border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm sticky bottom-0">
+            <div class="flex justify-around items-center h-20">
+                <a class="flex flex-col items-center gap-1 text-primary" href="/">
+                    <span class="material-symbols-outlined text-3xl">home</span>
+                    <span class="text-xs font-medium">Home</span>
+                </a>
+                <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="/scan">
+                    <span class="material-symbols-outlined text-3xl">photo_camera</span>
+                    <span class="text-xs font-medium">Scan</span>
+                </a>
+                <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="/history">
+                    <span class="material-symbols-outlined text-3xl">history</span>
+                    <span class="text-xs font-medium">History</span>
+                </a>
+                <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="/profile">
+                    <span class="material-symbols-outlined text-3xl">person</span>
+                    <span class="text-xs font-medium">Profile</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        function goToScan() {
+            window.location.href = '/scan';
+        }
+    </script>
+</body>
+</html>

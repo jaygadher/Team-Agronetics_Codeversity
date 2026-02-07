@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Plant Disease Details</title>
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Lexend:wght@400;500;700;900" onload="this.rel='stylesheet'" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#17cf17",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#112111",
+                        "text-light": "#112111",
+                        "text-dark": "#f6f8f6",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a2e1a",
+                        "border-light": "#e0e0e0",
+                        "border-dark": "#2c3e2c",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+    <div class="flex flex-col min-h-screen justify-between">
+        <div class="flex-grow">
+            <header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+                <div class="flex items-center p-4">
+                    <button onclick="goBack()" class="p-2 rounded-full hover:bg-primary/10">
+                        <span class="material-symbols-outlined text-text-light dark:text-text-dark">arrow_back</span>
+                    </button>
+                    <h1 class="text-lg font-bold flex-1 text-center pr-10">Disease Details</h1>
+                </div>
+            </header>
+            <main>
+                <div class="h-64 bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAu2otssDOSbSOnLoffSpQRDcuRr2raAE0aPofVp34s7-nrxoRXO7ZNi8OGPiqYh8ibUhZjZx7e4ex66hx1d8ZNH4PNIVssMlabLkHG5wN8lhD0uZNw50-QuEIn1wF2tTO1zEzP5PilrcrCTTsouuRQGuJszLnksq9hXWpTpOM-jtqvFIFkQLtBPL7GOnlY-R3EoioLOQM756HvRJ_3jGPY5uNEsX9PWtRJQbjU_KYKIrNUxBrR5RrZ2y7dZzTiKPmF3Q1Il1KGazAh");'></div>
+                <div class="p-6 space-y-6">
+                    <h2 id="diseaseTitle" class="text-2xl font-bold text-text-light dark:text-text-dark">Loading...</h2>
+                    <p id="diseaseDescription" class="text-base text-text-light/80 dark:text-text-dark/80">
+                        Loading disease information...
+                    </p>
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold border-b border-border-light dark:border-border-dark pb-2">Symptoms</h3>
+                        <p id="diseaseSymptoms" class="text-base text-text-light/80 dark:text-text-dark/80">
+                            Loading symptoms information...
+                        </p>
+                    </div>
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold border-b border-border-light dark:border-border-dark pb-2">Causes</h3>
+                        <p id="diseaseCauses" class="text-base text-text-light/80 dark:text-text-dark/80">
+                            Loading causes information...
+                        </p>
+                    </div>
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold border-b border-border-light dark:border-border-dark pb-2">Treatment</h3>
+                        <div id="diseaseTreatment" class="text-base text-text-light/80 dark:text-text-dark/80">
+                            Loading treatment information...
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <nav class="sticky bottom-0 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-sm border-t border-border-light dark:border-border-dark">
+            <div class="flex justify-around items-center p-2">
+                <a class="flex flex-col items-center gap-1 text-text-light/60 dark:text-text-dark/60 hover:text-primary dark:hover:text-primary" href="/">
+                    <span class="material-symbols-outlined">home</span>
+                    <span class="text-xs">Home</span>
+                </a>
+                <a class="flex flex-col items-center gap-1 text-text-light/60 dark:text-text-dark/60 p-3 rounded-full -mt-8 bg-primary text-white shadow-lg" href="/scan">
+                    <span class="material-symbols-outlined">photo_camera</span>
+                </a>
+                <a class="flex flex-col items-center gap-1 text-text-light/60 dark:text-text-dark/60 hover:text-primary dark:hover:text-primary" href="/history">
+                    <span class="material-symbols-outlined">history</span>
+                    <span class="text-xs">History</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        function goBack() {
+            window.location.href = '/results';
+        }
+
+        function formatDiseaseName(name) {
+            return name.replace(/_/g, ' ')
+                      .replace(/\b\w/g, l => l.toUpperCase())
+                      .replace('___', ' - ');
+        }
+
+        function getDiseaseInfo(diseaseName) {
+            // Comprehensive disease information database
+            const diseaseInfo = {
+                'Apple___Apple_scab': {
+                    title: 'Apple Scab',
+                    description: 'Apple scab is a fungal disease that affects apple trees. It causes dark, scabby lesions on leaves, fruit, and twigs.',
+                    symptoms: 'Dark, circular lesions on leaves that may cause leaf drop. Fruit develops corky, scabby spots that can crack.',
+                    causes: 'Caused by the fungus Venturia inaequalis. Spreads through wind and rain, thrives in cool, wet conditions.',
+                    treatment: '1. Apply fungicides in early spring before bud break\n2. Remove and destroy fallen leaves in autumn\n3. Improve air circulation by pruning\n4. Plant resistant varieties like Liberty or Enterprise\n5. Use preventive sprays every 7-10 days during wet weather'
+                },
+                'Apple___Black_rot': {
+                    title: 'Apple Black Rot',
+                    description: 'A fungal disease that causes fruit rot and canker formation on apple trees.',
+                    symptoms: 'Brown, circular lesions on fruit that develop into black rot. Cankers may form on branches.',
+                    causes: 'Caused by Botryosphaeria obtusa. Spreads through infected plant material and wounds.',
+                    treatment: '1. Prune and destroy infected branches during dry weather\n2. Apply fungicides containing captan or thiophanate-methyl\n3. Remove mummified fruit from trees\n4. Ensure good tree health through proper nutrition\n5. Avoid wounding trees during pruning'
+                },
+                'Apple___Cedar_apple_rust': {
+                    title: 'Cedar Apple Rust',
+                    description: 'A fungal disease that requires both cedar and apple trees to complete its life cycle.',
+                    symptoms: 'Yellow-orange spots on leaves, galls on cedar trees, and fruit deformities.',
+                    causes: 'Caused by Gymnosporangium juniperi-virginianae. Requires both host plants.',
+                    treatment: '1. Remove cedar trees within 2 miles if possible\n2. Apply fungicides in early spring\n3. Plant resistant apple varieties\n4. Remove galls from cedar trees\n5. Use preventive sprays during wet spring weather'
+                },
+                'Apple___healthy': {
+                    title: 'Healthy Apple',
+                    description: 'Your apple tree appears to be healthy with no signs of disease.',
+                    symptoms: 'No visible symptoms of disease. Leaves are green and healthy.',
+                    causes: 'No disease present. Good growing conditions and care.',
+                    treatment: '1. Continue current care practices\n2. Monitor regularly for early signs of disease\n3. Maintain proper watering and fertilization\n4. Prune annually for good air circulation\n5. Apply preventive fungicides in spring if disease history exists'
+                },
+                'Cherry_(including_sour)___Powdery_mildew': {
+                    title: 'Cherry Powdery Mildew',
+                    description: 'A fungal disease that creates white powdery coating on cherry leaves and fruit.',
+                    symptoms: 'White powdery spots on leaves, distorted growth, and reduced fruit quality.',
+                    causes: 'Caused by Podosphaera clandestina. Thrives in warm, dry conditions with high humidity.',
+                    treatment: '1. Apply sulfur-based fungicides early in season\n2. Improve air circulation through pruning\n3. Remove infected plant parts\n4. Use resistant varieties when possible\n5. Apply preventive sprays every 10-14 days'
+                },
+                'Cherry_(including_sour)___healthy': {
+                    title: 'Healthy Cherry',
+                    description: 'Your cherry tree appears to be healthy with no signs of disease.',
+                    symptoms: 'No visible symptoms of disease. Leaves and fruit appear healthy.',
+                    causes: 'No disease present. Good growing conditions.',
+                    treatment: '1. Continue current care practices\n2. Monitor for early disease signs\n3. Maintain proper irrigation and nutrition\n4. Annual pruning for structure and air flow\n5. Apply preventive treatments if needed'
+                },
+                'Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot': {
+                    title: 'Corn Gray Leaf Spot',
+                    description: 'A fungal disease that causes gray rectangular lesions on corn leaves.',
+                    symptoms: 'Gray rectangular lesions with brown borders, primarily on lower leaves.',
+                    causes: 'Caused by Cercospora zeae-maydis. Spreads in warm, humid conditions.',
+                    treatment: '1. Plant resistant hybrids\n2. Practice crop rotation with non-host crops\n3. Apply fungicides at tasseling stage\n4. Remove crop debris after harvest\n5. Avoid overhead irrigation if possible'
+                },
+                'Corn_(maize)___Common_rust_': {
+                    title: 'Corn Common Rust',
+                    description: 'A fungal disease that affects corn plants, causing reddish-brown pustules on leaves.',
+                    symptoms: 'Small, circular, reddish-brown pustules on both leaf surfaces. Can cause significant yield loss.',
+                    causes: 'Caused by Puccinia sorghi. Spreads through wind-dispersed spores in humid conditions.',
+                    treatment: '1. Plant resistant varieties\n2. Apply fungicides containing azoxystrobin or propiconazole\n3. Practice crop rotation\n4. Remove volunteer corn plants\n5. Monitor weather conditions for disease development'
+                },
+                'Corn_(maize)___Northern_Leaf_Blight': {
+                    title: 'Corn Northern Leaf Blight',
+                    description: 'A fungal disease causing large cigar-shaped lesions on corn leaves.',
+                    symptoms: 'Large, elliptical, gray-green lesions that turn brown and dry out.',
+                    causes: 'Caused by Exserohilum turcicum. Favors moderate temperatures and high humidity.',
+                    treatment: '1. Plant resistant hybrids\n2. Apply fungicides at first sign of disease\n3. Practice crop rotation\n4. Remove and destroy infected crop debris\n5. Use tillage to bury infected residue'
+                },
+                'Corn_(maize)___healthy': {
+                    title: 'Healthy Corn',
+                    description: 'Your corn plant appears to be healthy with no signs of disease.',
+                    symptoms: 'No visible symptoms of disease. Leaves are green and healthy.',
+                    causes: 'No disease present. Good growing conditions.',
+                    treatment: '1. Continue current care practices\n2. Monitor for disease development\n3. Maintain proper fertilization and irrigation\n4. Practice good field sanitation\n5. Consider preventive fungicide applications if disease pressure is high'
+                },
+                'Grape___Black_rot': {
+                    title: 'Grape Black Rot',
+                    description: 'A fungal disease that causes black, shriveled fruit and leaf spots on grapevines.',
+                    symptoms: 'Brown spots on leaves, black shriveled fruit, and cankers on stems.',
+                    causes: 'Caused by Guignardia bidwellii. Spreads in warm, humid conditions.',
+                    treatment: '1. Apply fungicides containing mancozeb or captan\n2. Remove and destroy infected fruit and leaves\n3. Improve air circulation through pruning\n4. Use resistant grape varieties\n5. Apply preventive sprays every 7-10 days during wet weather'
+                },
+                'Grape___Esca_(Black_Measles)': {
+                    title: 'Grape Esca (Black Measles)',
+                    description: 'A complex disease affecting grapevines, causing wood decay and leaf symptoms.',
+                    symptoms: 'Tiger-striped leaves, wood decay, and reduced vine vigor.',
+                    causes: 'Caused by multiple fungi including Phaeomoniella chlamydospora.',
+                    treatment: '1. Remove and destroy infected wood\n2. Apply protective wound dressings after pruning\n3. Use resistant rootstocks\n4. Maintain vine health through proper nutrition\n5. Consider trunk renewal for severely affected vines'
+                },
+                'Grape___Leaf_blight_(Isariopsis_Leaf_Spot)': {
+                    title: 'Grape Leaf Blight',
+                    description: 'A fungal disease causing angular leaf spots and defoliation in grapevines.',
+                    symptoms: 'Angular brown spots on leaves, premature defoliation, and reduced fruit quality.',
+                    causes: 'Caused by Isariopsis griseola. Favors warm, humid conditions.',
+                    treatment: '1. Apply fungicides containing copper or mancozeb\n2. Remove infected leaves and debris\n3. Improve air circulation through canopy management\n4. Use resistant varieties when available\n5. Apply preventive sprays during periods of high humidity'
+                },
+                'Grape___healthy': {
+                    title: 'Healthy Grape',
+                    description: 'Your grapevine appears to be healthy with no signs of disease.',
+                    symptoms: 'No visible symptoms of disease. Leaves and fruit appear healthy.',
+                    causes: 'No disease present. Good growing conditions.',
+                    treatment: '1. Continue current care practices\n2. Monitor for early disease signs\n3. Maintain proper pruning and training\n4. Apply preventive fungicides if disease history exists\n5. Ensure good air circulation in the canopy'
+                },
+                'Peach___Bacterial_spot': {
+                    title: 'Peach Bacterial Spot',
+                    description: 'A bacterial disease that causes spots on leaves, fruit, and twigs of peach trees.',
+                    symptoms: 'Small, angular spots on leaves, raised spots on fruit, and cankers on twigs.',
+                    causes: 'Caused by Xanthomonas arboricola pv. pruni. Spreads through rain splash and wind.',
+                    treatment: '1. Apply copper-based bactericides in early spring\n2. Remove and destroy infected plant parts\n3. Improve air circulation through pruning\n4. Use resistant varieties when available\n5. Avoid overhead irrigation to reduce leaf wetness'
+                },
+                'Peach___healthy': {
+                    title: 'Healthy Peach',
+                    description: 'Your peach tree appears to be healthy with no signs of disease.',
+                    symptoms: 'No visible symptoms of disease. Leaves and fruit appear healthy.',
+                    causes: 'No disease present. Good growing conditions.',
+                    treatment: '1. Continue current care practices\n2. Monitor for early disease signs\n3. Maintain proper pruning and nutrition\n4. Apply preventive treatments if needed\n5. Ensure good air circulation around the tree'
+                },
+                'Pepper__bell___Bacterial_spot': {
+                    title: 'Bell Pepper Bacterial Spot',
+                    description: 'A bacterial disease causing spots on pepper leaves, stems, and fruit.',
+                    symptoms: 'Small, water-soaked spots that become brown and angular on leaves and fruit.',
+                    causes: 'Caused by Xanthomonas species. Spreads through rain splash and contaminated tools.',
+                    treatment: '1. Use disease-free seeds and transplants\n2. Apply copper-based bactericides\n3. Avoid overhead watering\n4. Practice crop rotation\n5. Remove and destroy infected plants'
+                },
+                'Pepper__bell___healthy': {
+                    title: 'Healthy Bell Pepper',
+                    description: 'Your bell pepper plant appears to be healthy with no signs of disease.',
+                    symptoms: 'No visible symptoms of disease. Leaves and fruit appear healthy.',
+                    causes: 'No disease present. Good growing conditions.',
+                    treatment: '1. Continue current care practices\n2. Monitor for early disease signs\n3. Maintain proper watering and nutrition\n4. Use drip irrigation to avoid leaf wetness\n5. Practice good garden sanitation'
+                },
+                'Potato___Early_blight': {
+                    title: 'Potato Early Blight',
+                    description: 'A fungal disease causing target-like lesions on potato leaves and stems.',
+                    symptoms: 'Dark brown spots with concentric rings on leaves, starting from lower leaves.',
+                    causes: 'Caused by Alternaria solani. Favors warm temperatures and high humidity.',
+                    treatment: '1. Apply fungicides containing chlorothalonil or mancozeb\n2. Remove infected plant debris\n3. Practice crop rotation with non-host crops\n4. Use resistant varieties when available\n5. Ensure proper plant spacing for air circulation'
+                },
+                'Potato___Late_blight': {
+                    title: 'Potato Late Blight',
+                    description: 'A devastating fungal disease that can destroy entire potato crops if not controlled.',
+                    symptoms: 'Dark, water-soaked lesions on leaves with white fungal growth on undersides. Rapid tissue death.',
+                    causes: 'Caused by Phytophthora infestans. Spreads in cool, wet weather conditions.',
+                    treatment: '1. Apply fungicides preventatively with products containing chlorothalonil\n2. Improve drainage in fields\n3. Plant resistant varieties\n4. Remove and destroy infected plants immediately\n5. Use certified disease-free seed potatoes'
+                },
+                'Potato___healthy': {
+                    title: 'Healthy Potato',
+                    description: 'Your potato plant appears to be healthy with no signs of disease.',
+                    symptoms: 'No visible symptoms of disease. Leaves appear healthy and green.',
+                    causes: 'No disease present. Good growing conditions.',
+                    treatment: '1. Continue current care practices\n2. Monitor for early disease signs\n3. Maintain proper irrigation and nutrition\n4. Practice good field sanitation\n5. Consider preventive fungicide applications if disease pressure is high'
+                },
+                'Strawberry___Leaf_scorch': {
+                    title: 'Strawberry Leaf Scorch',
+                    description: 'A fungal disease causing purple spots and scorched appearance on strawberry leaves.',
+                    symptoms: 'Purple spots on leaves that expand and cause leaf scorching and defoliation.',
+                    causes: 'Caused by Diplocarpon earliana. Favors warm, humid conditions.',
+                    treatment: '1. Apply fungicides containing captan or thiophanate-methyl\n2. Remove infected leaves and plant debris\n3. Improve air circulation through proper spacing\n4. Use resistant varieties when available\n5. Apply preventive sprays every 7-10 days during wet weather'
+                },
+                'Strawberry___healthy': {
+                    title: 'Healthy Strawberry',
+                    description: 'Your strawberry plant appears to be healthy with no signs of disease.',
+                    symptoms: 'No visible symptoms of disease. Leaves and fruit appear healthy.',
+                    causes: 'No disease present. Good growing conditions.',
+                    treatment: '1. Continue current care practices\n2. Monitor for early disease signs\n3. Maintain proper irrigation and nutrition\n4. Remove old leaves after harvest\n5. Apply preventive fungicides if disease history exists'
+                },
+                'Tomato_Bacterial_spot': {
+                    title: 'Tomato Bacterial Spot',
+                    description: 'A bacterial disease causing spots on tomato leaves, stems, and fruit.',
+                    symptoms: 'Small, dark spots with yellow halos on leaves, stems, and fruit.',
+                    causes: 'Caused by Xanthomonas species. Spreads through rain splash and contaminated tools.',
+                    treatment: '1. Use disease-free seeds and transplants\n2. Apply copper-based bactericides\n3. Avoid overhead watering\n4. Practice crop rotation\n5. Remove and destroy infected plants'
+                },
+                'Tomato_Early_blight': {
+                    title: 'Tomato Early Blight',
+                    description: 'A common fungal disease affecting tomato plants, causing concentric ring patterns on leaves.',
+                    symptoms: 'Circular, brown lesions with concentric rings on older leaves. Can cause defoliation.',
+                    causes: 'Caused by Alternaria solani. Thrives in warm, humid conditions with poor air circulation.',
+                    treatment: '1. Remove infected plant debris\n2. Apply fungicides containing chlorothalonil or mancozeb\n3. Ensure proper plant spacing for air circulation\n4. Use resistant varieties when available\n5. Apply preventive sprays every 7-10 days during wet weather'
+                },
+                'Tomato_Late_blight': {
+                    title: 'Tomato Late Blight',
+                    description: 'A serious fungal disease that can rapidly destroy tomato plants and fruit.',
+                    symptoms: 'Dark, water-soaked lesions on leaves and stems. Fruit develops firm, dark lesions.',
+                    causes: 'Caused by Phytophthora infestans. Spreads rapidly in cool, wet conditions.',
+                    treatment: '1. Apply copper-based fungicides preventatively\n2. Improve air circulation and avoid overhead watering\n3. Remove and destroy infected plants immediately\n4. Use resistant varieties when available\n5. Apply fungicides every 7-10 days during cool, wet weather'
+                },
+                'Tomato_Leaf_Mold': {
+                    title: 'Tomato Leaf Mold',
+                    description: 'A fungal disease that affects tomato plants in greenhouse or high-humidity conditions.',
+                    symptoms: 'Yellow spots on upper leaf surfaces with gray mold on undersides.',
+                    causes: 'Caused by Passalora fulva. Thrives in high humidity and poor air circulation.',
+                    treatment: '1. Improve air circulation and reduce humidity\n2. Apply fungicides containing chlorothalonil\n3. Remove infected leaves\n4. Use resistant varieties\n5. Ensure proper spacing between plants'
+                },
+                'Tomato_Septoria_leaf_spot': {
+                    title: 'Tomato Septoria Leaf Spot',
+                    description: 'A fungal disease causing small spots with dark borders on tomato leaves.',
+                    symptoms: 'Small, circular spots with dark borders and light centers on lower leaves.',
+                    causes: 'Caused by Septoria lycopersici. Spreads through rain splash and contaminated soil.',
+                    treatment: '1. Remove infected leaves and plant debris\n2. Apply fungicides containing chlorothalonil or mancozeb\n3. Avoid overhead watering\n4. Practice crop rotation\n5. Use mulch to prevent soil splash'
+                },
+                'Tomato_Spider_mites_Two_spotted_spider_mite': {
+                    title: 'Tomato Spider Mites',
+                    description: 'Tiny arachnids that feed on tomato plants, causing stippling and webbing.',
+                    symptoms: 'Yellow stippling on leaves, fine webbing, and reduced plant vigor.',
+                    causes: 'Caused by Tetranychus urticae. Favors hot, dry conditions.',
+                    treatment: '1. Increase humidity around plants\n2. Apply miticides containing abamectin or spiromesifen\n3. Use predatory mites for biological control\n4. Remove heavily infested leaves\n5. Ensure adequate irrigation to reduce plant stress'
+                },
+                'Tomato__Target_Spot': {
+                    title: 'Tomato Target Spot',
+                    description: 'A fungal disease causing target-like lesions on tomato leaves and fruit.',
+                    symptoms: 'Circular spots with concentric rings, similar to a target pattern.',
+                    causes: 'Caused by Corynespora cassiicola. Favors warm, humid conditions.',
+                    treatment: '1. Apply fungicides containing chlorothalonil or azoxystrobin\n2. Remove infected plant debris\n3. Improve air circulation\n4. Use resistant varieties when available\n5. Practice crop rotation'
+                },
+                'Tomato__Tomato_Yellow_Leaf__Curl_Virus': {
+                    title: 'Tomato Yellow Leaf Curl Virus',
+                    description: 'A viral disease transmitted by whiteflies, causing yellowing and curling of leaves.',
+                    symptoms: 'Yellowing and upward curling of leaves, stunted growth, and reduced fruit production.',
+                    causes: 'Caused by TYLCV, transmitted by whiteflies (Bemisia tabaci).',
+                    treatment: '1. Control whitefly populations with insecticides\n2. Use virus-resistant varieties\n3. Remove and destroy infected plants\n4. Use reflective mulches to deter whiteflies\n5. Apply systemic insecticides for whitefly control'
+                },
+                'Tomato__Tomato_mosaic_virus': {
+                    title: 'Tomato Mosaic Virus',
+                    description: 'A viral disease causing mottled leaves and reduced fruit quality in tomatoes.',
+                    symptoms: 'Mottled or mosaic patterns on leaves, distorted growth, and reduced fruit quality.',
+                    causes: 'Caused by ToMV, spread through contaminated tools, hands, or infected seeds.',
+                    treatment: '1. Use virus-free seeds and transplants\n2. Sanitize tools and hands between plants\n3. Remove and destroy infected plants\n4. Control aphid vectors with insecticides\n5. Use resistant varieties when available'
+                },
+                'Tomato_healthy': {
+                    title: 'Healthy Tomato',
+                    description: 'Your tomato plant appears to be healthy with no signs of disease.',
+                    symptoms: 'No visible symptoms of disease. Leaves and fruit appear healthy.',
+                    causes: 'No disease present. Good growing conditions.',
+                    treatment: '1. Continue current care practices\n2. Monitor for early disease signs\n3. Maintain proper watering and nutrition\n4. Practice good garden sanitation\n5. Apply preventive treatments if disease history exists'
+                }
+            };
+
+            // Check for exact match first
+            if (diseaseInfo[diseaseName]) {
+                return diseaseInfo[diseaseName];
+            }
+
+            // Check for partial matches
+            const lowerDiseaseName = diseaseName.toLowerCase();
+            for (const [key, info] of Object.entries(diseaseInfo)) {
+                if (key.toLowerCase().includes(lowerDiseaseName) || lowerDiseaseName.includes(key.toLowerCase())) {
+                    return info;
+                }
+            }
+
+            // Default response for unknown diseases
+            const cleanName = formatDiseaseName(diseaseName);
+            return {
+                title: cleanName,
+                description: `Information about ${cleanName}. This is a plant condition that has been detected in your scan.`,
+                symptoms: 'Symptoms may vary depending on the specific condition and environmental factors.',
+                causes: 'Causes can include fungal, bacterial, or viral infections, environmental stress, or nutrient deficiencies.',
+                treatment: 'Consult with a local agricultural extension service or plant pathologist for specific treatment recommendations.'
+            };
+        }
+
+        function loadDiseaseInfo() {
+            const storedData = localStorage.getItem('diseaseInfo');
+            if (!storedData) {
+                window.location.href = '/';
+                return;
+            }
+
+            const data = JSON.parse(storedData);
+            const diseaseName = data.prediction;
+            const info = getDiseaseInfo(diseaseName);
+
+            document.getElementById('diseaseTitle').textContent = info.title;
+            document.getElementById('diseaseDescription').textContent = info.description;
+            document.getElementById('diseaseSymptoms').textContent = info.symptoms;
+            document.getElementById('diseaseCauses').textContent = info.causes;
+            
+            // Format treatment with numbered steps
+            const treatmentDiv = document.getElementById('diseaseTreatment');
+            const treatmentSteps = info.treatment.split('\n').filter(step => step.trim());
+            treatmentDiv.innerHTML = treatmentSteps.map(step => 
+                `<div class="mb-3 p-3 bg-primary/5 dark:bg-primary/10 rounded-lg border-l-4 border-primary">
+                    <span class="font-medium text-primary">${step}</span>
+                </div>`
+            ).join('');
+
+            // If focus requested, scroll to treatment
+            if (data.focus === 'treatment') {
+                const treatmentHeader = Array.from(document.querySelectorAll('h3')).find(h => h.textContent.trim().toLowerCase() === 'treatment');
+                if (treatmentHeader) {
+                    treatmentHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    treatmentHeader.classList.add('bg-primary/10');
+                    setTimeout(() => treatmentHeader.classList.remove('bg-primary/10'), 1500);
+                }
+            }
+        }
+
+        // Load disease info when page loads
+        document.addEventListener('DOMContentLoaded', loadDiseaseInfo);
+    </script>
+</body>
+</html>
